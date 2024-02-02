@@ -1,0 +1,644 @@
+---
+title: "EDATest_HR Analytics"
+author: "Hasitha Sai"
+date: "2023-04-24"
+output: html_document
+---
+
+# Package used to plot the graph for corelation
+
+```{r}
+install.packages("corrplot")
+```
+
+# Required Libraries
+
+```{r}
+# Load the required libraries
+library(tidyverse)
+library(validate)
+library(ggplot2)
+```
+
+
+# Below process, we will check if the data needs to be cleaned for further EDA test
+
+```{r}
+# Read the csv file
+HRAnalytics <- read.csv(file= 'hr.csv')
+```
+
+#To get the dimension of the dataset
+
+```{r}
+dim(HRAnalytics)
+```
+
+```{r}
+# check the names of the variables in dataset
+names(HRAnalytics)
+```
+
+```{r}
+# check the datatypes of all the variables
+str(HRAnalytics)
+```
+
+```{r}
+# Check the summary of the dataset
+summary(HRAnalytics)
+```
+
+It is noticed that there are 11 missing values in the dataset
+
+Removal of NA values are main part of data cleaning to get better results. 
+
+```{r}
+# Omit the missing values
+HRAnalytics <- na.omit(HRAnalytics)
+```
+
+
+```{r}
+# Check the summary of the dataset
+summary(HRAnalytics)
+View(HRAnalytics)
+```
+
+Writexl is an R package that provides efficient way to write data frames to excel files. To check the summary, we need to install this package.
+
+```{r}
+# Check the summary of the dataset
+install.packages("writexl")
+```
+
+
+```{r}
+# Check the summary of the dataset
+write_xlsx(HRAnalytics, "HRAnalytics_cleaned.xlsx")
+```
+
+Now lets check the count of unique values in a dataframe which the table function.
+
+```{r}
+
+#For Attrition
+table(HRAnalytics$Attrition)
+
+#For BusinessTravel
+table(HRAnalytics$BusinessTravel)
+
+#For Department
+table(HRAnalytics$Department)
+
+#For EducationField
+table(HRAnalytics$EducationField)
+
+#For Gender
+table(HRAnalytics$Gender)
+
+#For JobRole
+table(HRAnalytics$JobRole)
+
+#For MaritalStatus
+table(HRAnalytics$MaritalStatus)
+
+```
+#Below descriptions needs to be changed
+#1. It was observed that, the number of male customers are slightly more than the females.  
+#2. It was observed majority of the customers are not senior citizens.
+#3. It was observed that, majority of customers have have no partners
+#4. It was observed that, majority of the customers have no dependents
+#5. It was observed that,majority of customers do not have phoneservice. Very few number of the customers have no phone service
+#6. It was observed that majority of the customers were on monthly subscription followed by two years and one year  contract subscriptions.
+
+We need to change categorical variables to factor to get 
+
+```{r}
+# #Changing categorical variables to factor
+HRAnalytics$Attrition <- as.factor(HRAnalytics$Attrition)
+HRAnalytics$BusinessTravel <- as.factor(HRAnalytics$BusinessTravel)
+HRAnalytics$Department <- as.factor(HRAnalytics$Department)
+HRAnalytics$Education <- as.factor(HRAnalytics$Education)
+HRAnalytics$EducationField <- as.factor(HRAnalytics$EducationField)
+HRAnalytics$EnvironmentSatisfaction <- as.factor(HRAnalytics$EnvironmentSatisfaction)
+HRAnalytics$Gender <- as.factor(HRAnalytics$Gender)
+HRAnalytics$JobInvolvement <- as.factor(HRAnalytics$JobInvolvement)
+HRAnalytics$JobLevel <- as.factor(HRAnalytics$JobLevel)
+HRAnalytics$JobRole <- as.factor(HRAnalytics$JobRole)
+HRAnalytics$JobSatisfaction <- as.factor(HRAnalytics$JobSatisfaction)
+HRAnalytics$MaritalStatus <- as.factor(HRAnalytics$MaritalStatus)
+HRAnalytics$OverTime <- as.factor(HRAnalytics$OverTime)
+HRAnalytics$PerformanceRating <- as.factor(HRAnalytics$PerformanceRating)
+HRAnalytics$RelationshipSatisfaction <- as.factor(HRAnalytics$RelationshipSatisfaction)
+HRAnalytics$StockOptionLevel <- as.factor(HRAnalytics$StockOptionLevel)
+HRAnalytics$TrainingTimesLastYear <- as.factor(HRAnalytics$TrainingTimesLastYear)
+HRAnalytics$WorkLifeBalance <- as.factor(HRAnalytics$WorkLifeBalance)
+```
+
+
+# Exploratory Analysis:
+
+## Numerical variables Distribution:
+
+To know the statistical analysis we will check for the distribution of numeric variables.
+
+```{r}
+# checking for the distribution of numeric variables
+
+hist(HRAnalytics$Age, main="Distribution of Age", xlab="Age")
+hist(HRAnalytics$DailyRate, main="Distribution of DailyRate", xlab="DailyRate")
+hist(HRAnalytics$DistanceFromHome, main="Distribution of DistanceFromHome", xlab="DistanceFromHome")
+hist(HRAnalytics$HourlyRate, main="Distribution of HourlyRate", xlab="HourlyRate")
+hist(HRAnalytics$MonthlyIncome, main="Distribution of MonthlyIncome", xlab="MonthlyIncome")
+hist(HRAnalytics$MonthlyRate, main="Distribution of MonthlyRate", xlab="MonthlyRate")
+hist(HRAnalytics$NumCompaniesWorked, main="Distribution of NumCompaniesWorked", xlab="NumCompaniesWorked")
+hist(HRAnalytics$PercentSalaryHike, main="Distribution of PercentSalaryHike", xlab="PercentSalaryHike")
+hist(HRAnalytics$TotalWorkingYears, main="Distribution of TotalWorkingYears", xlab="TotalWorkingYears")
+hist(HRAnalytics$YearsAtCompany, main="Distribution of YearsAtCompany", xlab="YearsAtCompany")
+hist(HRAnalytics$YearsInCurrentRole, main="Distribution of YearsInCurrentRole", xlab="YearsInCurrentRole")
+hist(HRAnalytics$YearsSinceLastPromotion, main="Distribution of YearsSinceLastPromotion", xlab="YearsSinceLastPromotion")
+hist(HRAnalytics$YearsWithCurrManager, main="Distribution of YearsWithCurrManager", xlab="YearsWithCurrManager")
+```
+#Below descriptions needs to be changed
+
+> "Distribution of Tenure" and "Distribution of Monthly Charges" does not follow Normal Distribution.
+> "Distribution of Total Charges" chart shows that the data follows right skew[Skewness distribution is positive]
+
+
+#Categorical Variables Distribution:=
+
+```{r}
+# Categorical Variables Distribution
+ggplot(data = HRAnalytics, aes(x = Attrition)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("Attrition Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of Attrition using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = BusinessTravel)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("BusinessTravel Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of BusinessTravel using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = Department)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("Department Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of Department using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = Education)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("Education Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of Education using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = EnvironmentSatisfaction)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("EnvironmentSatisfaction Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of EnvironmentSatisfaction using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = Gender)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("Gender Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of Gender using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = JobInvolvement)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("JobInvolvement Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of JobInvolvement using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = JobLevel)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("JobLevel Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of JobLevel using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = JobRole)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("JobRole Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of JobRole using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = JobSatisfaction)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("JobSatisfaction Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of JobSatisfaction using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = MaritalStatus)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("MaritalStatus Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of MaritalStatus using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = OverTime)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("OverTime Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of OverTime using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = PerformanceRating)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("PerformanceRating Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of PerformanceRating using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = RelationshipSatisfaction)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("RelationshipSatisfaction Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of RelationshipSatisfaction using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = StockOptionLevel)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("StockOptionLevel Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of StockOptionLevel using Employee Data")
+
+ggplot(data = HRAnalytics, aes(x = WorkLifeBalance)) + geom_bar(fill = rgb(0.1, 0.4, 0.5, 0.7)) + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + geom_bar(color="black",fill="orange")+ xlab("WorkLifeBalance Distribution") + ylab("Count") + theme_light() + ggtitle("Distrubution of WorkLifeBalance using Employee Data")
+```
+
+#Need to rewrite
+> Distrubution of Gender using Telecom Services: 
+The number of male customers to the telecom is slightly more than females.
+
+> Distrubution of usage of Phone Services: 
+Majority of users opted for phone services.
+
+> Distrubution of usage of Online Security:
+Majority of users do not opt for online security and device protection.
+
+> Distrubution of usage of Online Backup: Major proportion of users have opted “No” for “Online Backup” Services.
+
+
+> Distrubution of usage of Device Protection: Major proportion of users have opted “No” for “Device Protection” Services.
+
+> Distrubution of usage of Streaming TV:There is a marginal difference between the usage of “Streaming Service” whereas the user which opted “NO” for the service is slightly greater then people opting for “Yes”.
+
+
+> Distrubution of usage of Paperless Billing: Users are more interested in opting for paperless billing and using “Electronic Check” as a “Payment Method”.
+
+> Distrubution of usage of Payment Method: Users are more inclined towards shorter contracts which include “month-to-month” followed by “Two-year” and then comes “one-year”.
+
+> Distrubution of usage of Multiple Lines: Users who have selected "No" are more with compare to the people who have selected "Yes"
+> Distrubution of usage of Contract: From this graph, we can see that users are more incline towards shorter contracts which include "month-to-month" and then comes "Two-year" followed by "one-year"
+
+
+```{r}
+ggplot(HRAnalytics, aes(x = Attrition,fill=Attrition ,color=Attrition)) + geom_bar() + stat_count(aes(label = ..count..), geom = "text", vjust = -0.3) + ggtitle("Count of Employees Attrition(Yes/No)")
+```
+
+> The bar chart shows that XX users have opted not to leave the company while XX employees have opted to leave the company.
+
+Exploring the various variables of employee data provided by the company and how does it effects attrition.
+
+# Attrition is a target variable here.
+
+# Let's check Attrition vs Numerical Variables distribution
+
+```{r}
+# Attrition vs numerical variables
+ggplot(HRAnalytics, aes(x=Attrition, y = Age,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = DailyRate,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = DistanceFromHome,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = HourlyRate,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = MonthlyIncome,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = MonthlyRate,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = NumCompaniesWorked,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = PercentSalaryHike,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = TotalWorkingYears,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = TrainingTimesLastYear,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = YearsAtCompany,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = YearsInCurrentRole,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = YearsSinceLastPromotion,fill=Attrition ,color = Attrition ))+geom_boxplot()
+ggplot(HRAnalytics, aes(x=Attrition, y = YearsWithCurrManager,fill=Attrition ,color = Attrition ))+geom_boxplot()
+```
+-Users who had longer tenure with the telecom tend to churn less compared to users with lesser tenure.
+-Users who have more Total Charges tend to stay with the telecom services compared to people with smaller Total Charges.
+-Users with more Monthly charges tend to churn the telecom company compared to users with less of Monthly charges.
+
+# Similarly, Attrition Vs Categorical Variables
+
+```{r}
+# Attrition vs BusinessTravel
+ggplot(HRAnalytics, aes(x = BusinessTravel, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs BusinessTravel") +  xlab("BusinessTravel") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+Customers who have a month-to-month contract are more likely to churn compared to customers who have one-year and two-year contract periods.
+
+
+```{r}
+# Attrition vs Department
+ggplot(HRAnalytics, aes(x = Department, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs Department") +  xlab("Department") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs Education
+ggplot(HRAnalytics, aes(x = Education, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs Education") +  xlab("Education") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs EducationField
+ggplot(HRAnalytics, aes(x = EducationField, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs EducationField") +  xlab("EducationField") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs EnvironmentSatisfaction
+ggplot(HRAnalytics, aes(x = EnvironmentSatisfaction, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs EnvironmentSatisfaction") +  xlab("EnvironmentSatisfaction") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs Gender
+ggplot(HRAnalytics, aes(x = Gender, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs Gender") +  xlab("Gender") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs JobInvolvement
+ggplot(HRAnalytics, aes(x = JobInvolvement, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs JobInvolvement") +  xlab("JobInvolvement") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs JobLevel
+ggplot(HRAnalytics, aes(x = JobLevel, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs JobLevel") +  xlab("JobLevel") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+ 
+
+```{r}
+# Attrition vs JobRole
+ggplot(HRAnalytics, aes(x = JobRole, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs JobRole") +  xlab("JobRole") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs JobSatisfaction
+ggplot(HRAnalytics, aes(x = JobSatisfaction, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs JobSatisfaction") +  xlab("JobSatisfaction") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs MaritalStatus
+ggplot(HRAnalytics, aes(x = MaritalStatus, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs MaritalStatus") +  xlab("MaritalStatus") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs OverTime
+ggplot(HRAnalytics, aes(x = OverTime, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs OverTime") +  xlab("OverTime") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs PerformanceRating
+ggplot(HRAnalytics, aes(x = PerformanceRating, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs PerformanceRating") +  xlab("PerformanceRating") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+```{r}
+# Attrition vs RelationshipSatisfaction
+ggplot(HRAnalytics, aes(x = RelationshipSatisfaction, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs RelationshipSatisfaction") +  xlab("RelationshipSatisfaction") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: customer's having month-to-month are more likely to churn compare to customers having one year and two year contract period.
+
+```{r}
+# Attrition vs StockOptionLevel
+ggplot(HRAnalytics, aes(x = StockOptionLevel, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs StockOptionLevel") +  xlab("StockOptionLevel") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: customer's having month-to-month are more likely to churn compare to customers having one year and two year contract period.
+
+```{r}
+# Attrition vs WorkLifeBalance
+ggplot(HRAnalytics, aes(x = WorkLifeBalance, fill = Attrition)) +  geom_bar(position = "fill") + ggtitle("Attrition vs WorkLifeBalance") +  xlab("WorkLifeBalance") +  ylab("Attrition") +  guides(fill = guide_legend(title = "Attrition"))
+```
+
+> Churn vs Contract: Customers who have a month-to-month plan are more likely to churn than customers who have a one-year or two-year contract period.
+
+Lets try the anova test:
+
+# Anova Test
+```{r}
+myanova <- aov(DailyRate ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+
+```{r}
+myanova <- aov(DistanceFromHome ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(HourlyRate ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(MonthlyIncome ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(MonthlyRate ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(NumCompaniesWorked ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(PercentSalaryHike ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(TotalWorkingYears ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+
+```{r}
+myanova <- aov(YearsAtCompany ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(YearsInCurrentRole ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(YearsSinceLastPromotion ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+```{r}
+myanova <- aov(YearsWithCurrManager ~ Attrition, data = HRAnalytics)
+summary(myanova)
+```
+
+There is a high correlation between Total Charges and tenure and Monthly charges.
+
+#Chi-Square Test to check the co relation between Attrition (target variable) and the categorical variables
+
+
+```{r}
+HRAttrition.catvar1<-table(HRAnalytics$Attrition, HRAnalytics$BusinessTravel)
+chisq.test(HRAttrition.catvar1)
+HRAttrition.catvar2<-table(HRAnalytics$Attrition, HRAnalytics$Department)
+chisq.test(HRAttrition.catvar2)
+HRAttrition.catvar3<-table(HRAnalytics$Attrition, HRAnalytics$Education)
+chisq.test(HRAttrition.catvar3)
+HRAttrition.catvar4<-table(HRAnalytics$Attrition, HRAnalytics$EducationField)
+chisq.test(HRAttrition.catvar4)
+HRAttrition.catvar5<-table(HRAnalytics$Attrition, HRAnalytics$EnvironmentSatisfaction)
+chisq.test(HRAttrition.catvar5)
+HRAttrition.catvar6<-table(HRAnalytics$Attrition, HRAnalytics$Gender)
+chisq.test(HRAttrition.catvar6)
+HRAttrition.catvar7<-table(HRAnalytics$Attrition, HRAnalytics$JobInvolvement)
+chisq.test(HRAttrition.catvar7)
+HRAttrition.catvar8<-table(HRAnalytics$Attrition, HRAnalytics$JobLevel)
+chisq.test(HRAttrition.catvar8)
+HRAttrition.catvar9<-table(HRAnalytics$Attrition, HRAnalytics$JobRole)
+chisq.test(HRAttrition.catvar9)
+HRAttrition.catvar10<-table(HRAnalytics$Attrition, HRAnalytics$JobSatisfaction)
+chisq.test(HRAttrition.catvar10)
+HRAttrition.catvar11<-table(HRAnalytics$Attrition, HRAnalytics$MaritalStatus)
+chisq.test(HRAttrition.catvar11)
+HRAttrition.catvar12<-table(HRAnalytics$Attrition, HRAnalytics$OverTime)
+chisq.test(HRAttrition.catvar12)
+HRAttrition.catvar13<-table(HRAnalytics$Attrition, HRAnalytics$PerformanceRating)
+chisq.test(HRAttrition.catvar13)
+HRAttrition.catvar14<-table(HRAnalytics$Attrition, HRAnalytics$RelationshipSatisfaction)
+chisq.test(HRAttrition.catvar14)
+HRAttrition.catvar15<-table(HRAnalytics$Attrition, HRAnalytics$StockOptionLevel)
+chisq.test
+HRAttrition.catvar16<-table(HRAnalytics$Attrition, HRAnalytics$WorkLifeBalance)
+chisq.test(HRAttrition.catvar16)
+```
+
+From the above values we understood the corealtion bewteen our target varibale and categorical variables.
+
+# PCA Test: Principal Component Analysis, is a statistical technique used to reduce the dimensionality of the data. It is mainly used to identify the patterns in the data and to detect the outliers aslo to reduce the noise in the data.
+We need two libraries to start.
+
+
+```{r}
+library(stats)
+library(dplyr)
+View(HRAnalytics)
+HRdata<- select(HRAnalytics,c('Age','DailyRate','DistanceFromHome','HourlyRate','MonthlyIncome','MonthlyRate','NumCompaniesWorked','PercentSalaryHike','TotalWorkingYears','YearsAtCompany','YearsInCurrentRole','YearsSinceLastPromotion','YearsWithCurrManager'))
+```
+
+```{r}
+str(HRdata)
+```
+
+
+#Check the corelation and the mean of continous variables
+```{r}
+cor(HRdata)
+mean(cor(HRdata))
+```
+These variables are highly correlated, and they are eligible for PCA. The average correlation is 0.7. 
+
+#Principal Component Analysis {#Principal_Component_Analysis}
+
+```{r}
+# perform PCA on the HRAnalytics dataset
+
+HRAttrition_data <- prcomp(HRdata, center = T, scale. = T,tol =0.20)
+[,:12]
+# inspect the attributes of the PCA object returned by prcomp
+attributes(HRAttrition_data)
+HRAttrition_data
+```
+
+# Visual analysis of PCA results{#Visual_analysis_PCA}
+
+```{r}
+# calculate the proportion of explained variance (PEV) from the std values
+# calculate the proportion of explained variance (PEV) from the std values
+HRAttrition_data_var <- HRAttrition_data$sdev^2
+HRAttrition_data_var
+HRAttrition_PEV <- HRAttrition_data_var / sum(HRAttrition_data_var)
+HRAttrition_PEV
+
+# plot the variance per PC
+plot(HRAttrition_data)
+```
+PC1 and PC2 have much more variance than the rest of the PCs according to the graph.
+
+"Proportion of Explained Variance" is referred to as PEV. To figure out how much of the variance in the data is explained by each principle component, principal component analysis (PCA) is utilised. To decide how many principle components should be preserved for future analysis, the cumulative value of PEV for an increasing number of additional PCs is shown.
+
+
+```{r}
+
+# plot the cumulative value of PEV for increasing number of additional PCs
+
+opar <- par(no.readonly = TRUE)
+plot(
+  cumsum(HRAttrition_PEV),
+  ylim = c(0,1),
+  xlab = 'PC',
+  ylab = 'cumulative PEV',
+  pch = 20,
+  col = 'orange'
+)
+abline(h = 0.8, col = 'red', lty = 'dashed')
+par(opar)
+
+# get and inspect the loadings for each PC
+
+HRAttrition_loadings <- HRAttrition_data$rotation
+HRAttrition_loadings
+
+# plot the loadings for the first three PCs as a barplot
+#   note: two vectors for colours and labels are created for convenience
+#     for details on the other parameters see the help for barplot and legend
+opar <- par(no.readonly = TRUE)
+colvector = c('red', 'orange', 'yellow', 'green', 'cyan', 'blue')
+labvector = c('PC1', 'PC2', 'PC3','PC4', 'PC5', 'PC6','PC7','PC8', 'PC9', 'PC10')
+barplot(
+  HRAttrition_loadings[,c(1:10)],
+  beside = T,
+  yaxt = 'n',
+  names.arg = labvector,
+  col = colvector,
+  ylim = c(-1,1),
+  border = 'white',
+  ylab = 'loadings'
+)
+axis(2, seq(-1,1,0.1))
+legend(
+  'bottomright',
+  bty = 'n',
+  col = colvector,
+  pch = 15,
+  row.names(HRAttrition_loadings)
+)
+par(opar)
+
+# generate a biplot for each pair of important PCs 
+
+opar <- par(no.readonly = TRUE)
+par(mfrow = c(2,2))
+biplot(
+  HRAttrition_data,
+  scale = 0,
+  col = c('grey40','blue')
+)
+biplot(
+  HRAttrition_data,
+  choices = c(1,3),
+  scale = 0,
+  col = c('grey40','blue')
+)
+biplot(
+  HRAttrition_data,
+  choices = c(2,3),
+  scale = 0,
+  col = c('grey40','blue')
+)
+par(opar)
+
+
+
+View(HRdata)
+
+HRdata$Attrition <- factor(HRdata$Attrition)
+
+
+```
+```{r}
+HR_PCA <- data.frame(HRAttrition_data$x)
+HR_PCA<-HR_PCA[,1:7]
+HR_PCA$Attrition<-HRAnalytics$Attrition
+HR_PCA
+write.csv(HR_PCA, "HR_PCA.csv", row.names = FALSE)
+```
+
+# It seems that the vectors tenure and monthly charges are quite near to one another on the biplot of PC2 and PC3. This suggests that they are highly correlated and are going towards the same direction.
+
+Below are the observations of PCA
+
+* Based on your observations, it seems that TotalCharges has a significant impact on PC1 and that MonthlyCharges has a high negative loading for PC2.
+* Additionally, TotalCharges has a high negative loading for PC3. The negative loadings for PC2 and PC3 represent negative correlations between MonthlyCharges and TotalCharges with the other variables. 
+* The vectors tenure and monthly charges are quite near to one another on the biplot of PC1 and PC3, which suggests that they are highly correlated. Fina
+
+```
+
+
+
+
+
+
+
+
+
+
